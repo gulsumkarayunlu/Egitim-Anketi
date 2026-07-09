@@ -15,7 +15,7 @@ st.set_page_config(page_title="Eğitim Bilgisi Anketi", layout="centered")
 
 st.markdown("""
     <style>
-    .stApp { background-color: #0D1B3E; }
+    .stApp { background-color: #1E3F73; }
     .stApp, p, label, h1, h2, h3, h4, h5, h6, .stMarkdown { color: #FFFFFF !important; }
     div[data-baseweb="select"] > div, input { background-color: #F0F2F6 !important; color: #000000 !important; }
     hr { border-color: #4A5568 !important; }
@@ -63,6 +63,11 @@ yuksekogrenim_seviyeleri = ["Ön Lisans", "Lisans", "Yüksek Lisans", "Doktora"]
 
 sicil = st.text_input("Sicil Numaranızı Giriniz (Zorunlu):", placeholder="Lütfen sicil numaranızı yazın...")
 
+sicil_gecerli = True
+if sicil and not sicil.isdigit():
+    sicil_gecerli = False
+    st.error("❌ Sicil Numarası yalnızca rakamlardan oluşmalıdır. Lütfen harf veya özel karakter kullanmayınız.")
+
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 1. Bölüm: Güncel Eğitim Bilgileriniz")
 
@@ -107,11 +112,20 @@ if durum in devam_terk_durumlari:
             ["Seçiniz..."] + (uni_dept_map.get(son_kurum, []) if son_kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
         )
 
+# "Diğer" serbest metin alanı - sadece Yüksek Lisans veya Doktora seçildiğinde görünür
+yuksek_seviyeler_diger = ["Yüksek Lisans", "Doktora"]
+diger_metin = ""
+if seviye in yuksek_seviyeler_diger or son_seviye in yuksek_seviyeler_diger:
+    st.markdown("---")
+    diger_metin = st.text_area("Diğer (Eklemek istediğiniz ek bilgi varsa buraya yazınız)", placeholder="İsteğe bağlı ek bilgi...")
+
 st.markdown("<br>", unsafe_allow_html=True)
 
 if st.button("Kaydet", type="primary", use_container_width=True):
     if not sicil:
         st.error("❌ Lütfen Sicil Numaranızı giriniz.")
+    elif not sicil_gecerli:
+        st.error("❌ Sicil Numarası yalnızca rakamlardan oluşmalıdır. Lütfen düzeltiniz.")
     elif durum == "Seçiniz..." or seviye == "Seçiniz...":
         st.error("❌ Lütfen Eğitim Seviyesi ve Mezuniyet Durumu alanlarını boş bırakmayınız.")
     elif durum in devam_terk_durumlari and son_seviye == "Seçiniz...":
@@ -128,7 +142,8 @@ if st.button("Kaydet", type="primary", use_container_width=True):
             "4. Bölüm Adı": bolum if bolum != "Seçiniz..." else "",
             "5. Son Mezuniyet Seviyesi": son_seviye if son_seviye != "Seçiniz..." else "",
             "6. Son Mezuniyet Kurumu": son_kurum if son_kurum != "Seçiniz..." else "",
-            "7. Son Mezuniyet Bölümü": son_bolum if son_bolum != "Seçiniz..." else ""
+            "7. Son Mezuniyet Bölümü": son_bolum if son_bolum != "Seçiniz..." else "",
+            "8. Diğer": diger_metin
         }
 
         try:
