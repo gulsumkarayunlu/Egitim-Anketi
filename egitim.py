@@ -58,6 +58,9 @@ else:
 
 seviyeler = ["İlkokul", "Ortaokul", "Lise", "Ön Lisans", "Lisans", "Yüksek Lisans", "Doktora"]
 
+# Üniversite/Bölüm seçiminin gerekli olduğu eğitim seviyeleri
+yuksekogrenim_seviyeleri = ["Ön Lisans", "Lisans", "Yüksek Lisans", "Doktora"]
+
 sicil = st.text_input("Sicil Numaranızı Giriniz (Zorunlu):", placeholder="Lütfen sicil numaranızı yazın...")
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -69,11 +72,15 @@ with col1:
 with col2:
     durum = st.selectbox("2. Mezuniyet Durumu", ["Seçiniz...", "Mezun", "Devam Ediyor", "Terk"])
 
-kurum = st.selectbox("3. Kurum Adı (Listeden seçin veya yazarak arayın)", ["Seçiniz..."] + universities)
-bolum = st.selectbox(
-    "4. Bölüm Adı (Listeden seçin veya yazarak arayın)",
-    ["Seçiniz..."] + (uni_dept_map.get(kurum, []) if kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
-)
+# Kurum ve Bölüm sadece Ön Lisans, Lisans, Yüksek Lisans ve Doktora seçildiğinde gösterilir
+kurum = "Seçiniz..."
+bolum = "Seçiniz..."
+if seviye in yuksekogrenim_seviyeleri:
+    kurum = st.selectbox("3. Kurum Adı (Listeden seçin veya yazarak arayın)", ["Seçiniz..."] + universities)
+    bolum = st.selectbox(
+        "4. Bölüm Adı (Listeden seçin veya yazarak arayın)",
+        ["Seçiniz..."] + (uni_dept_map.get(kurum, []) if kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
+    )
 
 st.markdown("---")
 st.markdown("### 2. Bölüm: Son Tamamlanan Eğitim (Sadece Devam / Terk Seçenler İçin)")
@@ -82,12 +89,16 @@ col3, col4 = st.columns(2)
 with col3:
     son_seviye = st.selectbox("5. Son Mezun Olunan Eğitim Seviyesi", ["Seçiniz..."] + seviyeler)
 with col4:
-    son_kurum = st.selectbox("6. Son Mezun Olunan Kurum Adı", ["Seçiniz..."] + universities)
+    son_kurum = "Seçiniz..."
+    if son_seviye in yuksekogrenim_seviyeleri:
+        son_kurum = st.selectbox("6. Son Mezun Olunan Kurum Adı", ["Seçiniz..."] + universities)
 
-son_bolum = st.selectbox(
-    "7. Son Mezun Olunan Bölüm Adı",
-    ["Seçiniz..."] + (uni_dept_map.get(son_kurum, []) if son_kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
-)
+son_bolum = "Seçiniz..."
+if son_seviye in yuksekogrenim_seviyeleri:
+    son_bolum = st.selectbox(
+        "7. Son Mezun Olunan Bölüm Adı",
+        ["Seçiniz..."] + (uni_dept_map.get(son_kurum, []) if son_kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
+    )
 
 st.markdown("<br>", unsafe_allow_html=True)
 
