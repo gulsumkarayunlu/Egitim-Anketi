@@ -82,23 +82,30 @@ if seviye in yuksekogrenim_seviyeleri:
         ["Seçiniz..."] + (uni_dept_map.get(kurum, []) if kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
     )
 
-st.markdown("---")
-st.markdown("### 2. Bölüm: Son Tamamlanan Eğitim (Sadece Devam / Terk Seçenler İçin)")
+# "Bölüm B - Son Mezun Olunan Eğitim Bilgisi" sadece Mezuniyet Durumu
+# "Devam Ediyor" ya da "Terk" seçildiğinde gösterilir.
+devam_terk_durumlari = ["Devam Ediyor", "Terk"]
 
-col3, col4 = st.columns(2)
-with col3:
-    son_seviye = st.selectbox("5. Son Mezun Olunan Eğitim Seviyesi", ["Seçiniz..."] + seviyeler)
-with col4:
-    son_kurum = "Seçiniz..."
-    if son_seviye in yuksekogrenim_seviyeleri:
-        son_kurum = st.selectbox("6. Son Mezun Olunan Kurum Adı", ["Seçiniz..."] + universities)
-
+son_seviye = "Seçiniz..."
+son_kurum = "Seçiniz..."
 son_bolum = "Seçiniz..."
-if son_seviye in yuksekogrenim_seviyeleri:
-    son_bolum = st.selectbox(
-        "7. Son Mezun Olunan Bölüm Adı",
-        ["Seçiniz..."] + (uni_dept_map.get(son_kurum, []) if son_kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
-    )
+
+if durum in devam_terk_durumlari:
+    st.markdown("---")
+    st.markdown("### 2. Bölüm: Son Tamamlanan Eğitim (Sadece Devam / Terk Seçenler İçin)")
+
+    col3, col4 = st.columns(2)
+    with col3:
+        son_seviye = st.selectbox("5. Son Mezun Olunan Eğitim Seviyesi", ["Seçiniz..."] + seviyeler)
+    with col4:
+        if son_seviye in yuksekogrenim_seviyeleri:
+            son_kurum = st.selectbox("6. Son Mezun Olunan Kurum Adı", ["Seçiniz..."] + universities)
+
+    if son_seviye in yuksekogrenim_seviyeleri:
+        son_bolum = st.selectbox(
+            "7. Son Mezun Olunan Bölüm Adı",
+            ["Seçiniz..."] + (uni_dept_map.get(son_kurum, []) if son_kurum not in ["Seçiniz...", "Veri Bulunamadı"] else [])
+        )
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -107,6 +114,8 @@ if st.button("Kaydet", type="primary", use_container_width=True):
         st.error("❌ Lütfen Sicil Numaranızı giriniz.")
     elif durum == "Seçiniz..." or seviye == "Seçiniz...":
         st.error("❌ Lütfen Eğitim Seviyesi ve Mezuniyet Durumu alanlarını boş bırakmayınız.")
+    elif durum in devam_terk_durumlari and son_seviye == "Seçiniz...":
+        st.error("❌ Lütfen Son Mezun Olunan Eğitim Seviyesini seçiniz.")
     elif GOOGLE_WEBHOOK_URL == "BURAYA_LINKI_YAPISTIRIN":
         st.error("❌ Geliştirici Hatası: Lütfen koddaki GOOGLE_WEBHOOK_URL alanına Google linkini yapıştırın.")
     else:
